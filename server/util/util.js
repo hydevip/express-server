@@ -2,6 +2,7 @@
 const AUTH_TOKEN = process.env.AUTH_TOKEN;
 const RADIUS_EARTH_KM = 6371;
 
+// We create a middleware to check if the request has the correct authorization token
 function checkAuth(req, res, next) {
     const token = req.headers['authorization']?.split(' ')[1];
     if (token === AUTH_TOKEN) {

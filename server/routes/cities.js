@@ -6,6 +6,7 @@ const zlib = require('zlib');
 const { query, validationResult } = require('express-validator');
 const { checkAuth, calculateDistance } = require('../util/util');
 const addresses = require('../addresses.json');
+const asyncHandler = require('express-async-handler')
 
 
 const areaTasks = {};
@@ -14,7 +15,7 @@ const areaTasks = {};
 router.get('/cities-by-tag', checkAuth, [
     query('tag').isString().notEmpty(),
     query('isActive').isBoolean(),
-], (req, res) => {
+],  asyncHandler((req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -24,9 +25,9 @@ router.get('/cities-by-tag', checkAuth, [
         city.tags.includes(tag) && city.isActive.toString() === isActive
     );
     res.json({ cities: filteredCities });
-});
+}));
 
-router.get('/distance', checkAuth, (req, res) => {
+router.get('/distance', checkAuth, asyncHandler((req, res) => {
     try {
         const { from, to } = req.query;
         const cityFrom = addresses.find(city => city.guid === from);
@@ -46,10 +47,10 @@ router.get('/distance', checkAuth, (req, res) => {
         console.log("error", error);
     }
 
-});
+}));
 
 // Start a task to find cities within a radius
-router.get('/area', checkAuth, async (req, res) => {
+router.get('/area', checkAuth, asyncHandler(async (req, res) => {
     const { from, distance } = req.query;
     const originCity = addresses.find(city => city.guid === from);
 
@@ -68,10 +69,10 @@ router.get('/area', checkAuth, async (req, res) => {
     }, 10); // Simulating delay
 
     res.status(202).json({ resultsUrl: `http://127.0.0.1:8080/area-result/${resultId}` });
-});
+}));
 
 // Polling endpoint to get area job result
-router.get('/area-result/:id', checkAuth, (req, res) => {
+router.get('/area-result/:id', checkAuth, asyncHandler((req, res) => {
 
     const areaTask = areaTasks[req.params.id];
     if (!areaTask) return res.sendStatus(404);
@@ -82,16 +83,16 @@ router.get('/area-result/:id', checkAuth, (req, res) => {
     } else {
         res.json({ cities: areaTask.cities });
     }
-});
+}));
 
 // Endpoint to stream all cities in a compressed file
-router.get('/all-cities', checkAuth, (req, res) => {
+router.get('/all-cities', checkAuth, asyncHandler((req, res) => {
 
     const filePath = path.join(__dirname, '../addresses.json');
     res.setHeader('Content-Encoding', 'gzip');
     res.setHeader('Content-Type', 'application/json');
     const readStream = fs.createReadStream(filePath).pipe(zlib.createGzip()); // We compress the file with gzip
     readStream.pipe(res);
-});
+}));
 
 module.exports = router;

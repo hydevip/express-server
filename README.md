@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a backend server application built with Node.js and Express. It is designed to handle HTTP requests, log activities, secure the application, and manage API rate limiting. The server also supports multi-core systems by utilizing clustering to run multiple instances.
+This project is a backend server application built with Node.js and Express. It is designed to handle HTTP requests, log activities, secure the application, and manage API rate limiting, generic error handler middleware and generic async handler for the routes controllers. The server also supports multi-core systems by utilizing clustering to run multiple instances.
 
 ## Requirements
  Node Js v20.9.0
@@ -51,6 +51,7 @@ This project is a backend server application built with Node.js and Express. It 
 ```sh
 npm run test
 ```
+![alt text](image.png)
 
 3. **Start the Express Server**:
 

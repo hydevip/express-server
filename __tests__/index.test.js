@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const citiesRouter = require('../server/routes/cities');
-const { checkAuth, calculateDistance } = require('../server/util/util');
+const { checkAuth, calculateDistance, asyncHandler } = require('../server/util/util');
 
 jest.mock('../server/util/util', () => ({
     checkAuth: (req, res, next) => next(),
